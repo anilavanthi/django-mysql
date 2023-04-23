@@ -308,4 +308,4 @@ class DeviceLogByUser(generics.ListAPIView):
     ordering_fields = ['id', 'login','device','user','logout']
 
     def get_queryset(self, **kwargs):
-        return DeviceLog.objects.filter(user=self.kwargs['pk'],  status= 1).order_by('-id')
+        return DeviceLog.objects.filter(user=self.kwargs['pk'],  status= 1).order_by('id')

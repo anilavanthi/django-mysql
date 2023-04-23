@@ -4,17 +4,17 @@ class Profiles:
     salesuser = 6
 
 class Note:
-    welcome_subject_touser ="Welcome to Wheelsmart"
-    welcome_body_touser ="Welcome to Wheelsmart. Last Login time: {0}."
+    welcome_subject_touser ="Welcome to Annapurna Marriages"
+    welcome_body_touser ="Welcome to Annapurna Marriages. Last Login time: {0}."
     
    
 class SMS:
     
-    postfix ="\nFrom,\nWheelsmart."
+    postfix ="\nFrom,\nAnnapurna Marriages."
 
-    loginotp="Please used this OTP {otp} to Login your application By Wheelsmart.."
+    loginotp="Please used this OTP {otp} to Login your application By Annapurna Marriages.."
 
-    welcome_touser ="Welcome to Wheelsmart. Your login details are as follows:\n\nUsername: {username}\nPassword: {password}"
+    welcome_touser ="Welcome to Annapurna Marriages. Your login details are as follows:\n\nUsername: {username}\nPassword: {password}"
 
     purchase_create_customer ="Dear {customername}\n Thank You for your Sale"
     sale_create_customer ="Dear {customername}\n Thank You for your Purchase "
@@ -29,10 +29,10 @@ class SMS:
        
 class Email:
     
-    postfix ="\nFrom,\nWheelsmart."
+    postfix ="\nFrom,\nAnnapurna Marriages."
 
-    welcome_subject_touser ="Welcome to Wheelsmart"
-    welcome_body_touser ="Welcome to Wheelsmart. Please login to your account."
+    welcome_subject_touser ="Welcome to Annapurna Marriages"
+    welcome_body_touser ="Welcome to Annapurna Marriages. Please login to your account."
 
 
     

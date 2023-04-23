@@ -32,7 +32,8 @@ class UserCommonSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'address', 'phone','state','district','city','area')
+        fields = ('username','email','phone')
+        # fields = '__all__'
 
 class UserMiniSerializer(serializers.ModelSerializer):
     

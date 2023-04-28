@@ -1,8 +1,12 @@
+from datetime import datetime
+
 from django.shortcuts import render
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework import generics, status, views, permissions
 
-from Masters.models import Country
+from Masters.models import Country, State, District, City, Branch, Religion, Caste, SubCaste, Occupation, Education, \
+    Language, Source
 from Masters.serializers import StateSerializer, DistrictSerializer, CitySerializer, CountrySerializer, \
     BranchSerializer, ReligionSerializer, \
     CasteSerializer, SubCasteSerializer, OccupationSerializer, EducationSerializer, LanguageSerializer, SourceSerializer
@@ -14,6 +18,7 @@ class CountryRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
     serializer_class = CountrySerializer
+    countries = Country.objects.all()
     def post(self, request, *args, **kwargs):
         serializer=self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -32,7 +37,56 @@ class CountryRegisterView(generics.ListCreateAPIView):
         serializer = CountrySerializer(countries, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
+    def put(self, request):
+        try:
+            current_user = request.user
+            country_json = self.countries.filter(id=request.data['id'])
+            country_json.update(code=request.data['code'],
+                                    name=request.data['name'],
+                                    status=request.data['status'],
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            serializer = CountrySerializer(country_json, many=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code, 'message': 'Country Details Updated Successfully',
+                        "country_details": serializer.data, }
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
 
+    def patch(self,request,id=None):
+        try:
+            current_user = request.user
+            # country_json = self.countries.filter(id=request.data['id'])
+            country_json = self.countries.filter(id=id)
+            country = Country.objects.get(id=id)
+            if(country.status==1):
+                statusValue=0
+            else:
+                statusValue=1
+            country_json.update(status=statusValue,
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            serializer = CountrySerializer(country_json, partial=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code, 'message': 'Country Status Updated Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+    def delete(self, request,id=None):
+        try:
+            self.countries.filter(id=id).delete()
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': ' country deleted successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)
 
 class StateRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -47,6 +101,16 @@ class StateRegisterView(generics.ListCreateAPIView):
             "message":"state created successfully"
         })
 
+    def get(self,request,id=None):
+        if id:
+            state = State.objects.get(id=id)
+            serializer = StateSerializer(state)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        states = State.objects.all()
+        serializer = StateSerializer(states, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
 class DistrictRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
@@ -59,6 +123,16 @@ class DistrictRegisterView(generics.ListCreateAPIView):
             "district":DistrictSerializer(district, context=self.get_serializer_context()).data,
             "message":"District created successfully"
         })
+
+    def get(self,request,id=None):
+        if id:
+            district = District.objects.get(id=id)
+            serializer = DistrictSerializer(district)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        districts = District.objects.all()
+        serializer = DistrictSerializer(districts, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 
 class CityRegisterView(generics.ListCreateAPIView):
@@ -74,6 +148,17 @@ class CityRegisterView(generics.ListCreateAPIView):
             "message":"City created successfully"
         })
 
+    def get(self,request,id=None):
+        if id:
+            city = City.objects.get(id=id)
+            serializer = CitySerializer(city)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        cities = City.objects.all()
+        serializer = CitySerializer(cities, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+
 class BranchRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
@@ -86,6 +171,16 @@ class BranchRegisterView(generics.ListCreateAPIView):
             "branch":BranchSerializer(branch, context=self.get_serializer_context()).data,
             "message":"Branch created successfully"
         })
+    def get(self,request,id=None):
+        if id:
+            branch = Branch.objects.get(id=id)
+            serializer = BranchSerializer(branch)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        branches = Branch.objects.all()
+        serializer = BranchSerializer(branches, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
 
 class ReligionRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -99,6 +194,15 @@ class ReligionRegisterView(generics.ListCreateAPIView):
             "religion":ReligionSerializer(religion, context=self.get_serializer_context()).data,
             "message":"Religion created successfully"
         })
+    def get(self,request,id=None):
+        if id:
+            religion = Religion.objects.get(id=id)
+            serializer = ReligionSerializer(religion)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        religions = Religion.objects.all()
+        serializer = ReligionSerializer(religions, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 class CasteRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -112,7 +216,15 @@ class CasteRegisterView(generics.ListCreateAPIView):
             "caste":CasteSerializer(caste, context=self.get_serializer_context()).data,
             "message":"Caste created successfully"
         })
+    def get(self,request,id=None):
+        if id:
+            caste = Caste.objects.get(id=id)
+            serializer = CasteSerializer(caste)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
+        castes = Caste.objects.all()
+        serializer = CasteSerializer(castes, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 class SubCasteRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -126,6 +238,15 @@ class SubCasteRegisterView(generics.ListCreateAPIView):
             "subcaste":SubCasteSerializer(subcaste, context=self.get_serializer_context()).data,
             "message":"Sub-Caste created successfully"
         })
+    def get(self, request, id=None):
+        if id:
+            subcaste = SubCaste.objects.get(id=id)
+            serializer = SubCasteSerializer(subcaste)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        subcastes = SubCaste.objects.all()
+        serializer = SubCasteSerializer(subcastes, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 class OccupationRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -139,6 +260,15 @@ class OccupationRegisterView(generics.ListCreateAPIView):
             "occupation":OccupationSerializer(occupation, context=self.get_serializer_context()).data,
             "message":"Occupation created successfully"
         })
+    def get(self, request, id=None):
+        if id:
+            occupation = Occupation.objects.get(id=id)
+            serializer = OccupationSerializer(occupation)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        occupations = Occupation.objects.all()
+        serializer = OccupationSerializer(occupations, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 
 class EducationRegisterView(generics.ListCreateAPIView):
@@ -154,6 +284,15 @@ class EducationRegisterView(generics.ListCreateAPIView):
             "education": EducationSerializer(education, context=self.get_serializer_context()).data,
             "message": "Education created successfully"
         })
+    def get(self, request, id=None):
+        if id:
+            education = Education.objects.get(id=id)
+            serializer = EducationSerializer(education)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        educations = Education.objects.all()
+        serializer = EducationSerializer(educations, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 
 class LanguageRegisterView(generics.ListCreateAPIView):
@@ -169,6 +308,15 @@ class LanguageRegisterView(generics.ListCreateAPIView):
             "language": LanguageSerializer(language, context=self.get_serializer_context()).data,
             "message": "Language created successfully"
         })
+    def get(self, request, id=None):
+        if id:
+            language = Language.objects.get(id=id)
+            serializer = LanguageSerializer(language)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        languages = Language.objects.all()
+        serializer = LanguageSerializer(languages, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 
 class SourceRegisterView(generics.ListCreateAPIView):
@@ -184,3 +332,12 @@ class SourceRegisterView(generics.ListCreateAPIView):
             "source": SourceSerializer(source, context=self.get_serializer_context()).data,
             "message": "Source created successfully"
         })
+    def get(self, request, id=None):
+        if id:
+            source = Source.objects.get(id=id)
+            serializer = SourceSerializer(source)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        sources = Source.objects.all()
+        serializer = SourceSerializer(sources, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)

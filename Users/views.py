@@ -83,9 +83,24 @@ class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            user_serializer = self.serializer_class(data=request.data, context={'request': request})
+            user_serializer.is_valid(raise_exception=True)
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code,
+                        'message': 'user details retrived Successfully', 'user_details': user_serializer.data}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, 'message': str(error)}
+        return Response(response, status=status_code)
+        # serializer = self.serializer_class(data=request.data, context={'request': request})
+        # serializer.is_valid(raise_exception=True)
+        #
+        # user = serializer.validated_data['user']
+        # serializer = self.serializer_class(data=request.data)
+        # serializer.is_valid(raise_exception=True)
+        # user = serializer.validated_data['user']
+        # return Response(serializer.data, status=status.HTTP_200_OK)
 
 class OTPRequestAPIView(generics.GenericAPIView):
     

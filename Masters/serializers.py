@@ -5,7 +5,7 @@ class CountrySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Country
 		fields = '__all__'
-		read_only_fields = ['user']
+		# read_only_fields = ['user']
 
 	def validate(self, attrs):
 		attrs['createdby'] = self.context['request'].user

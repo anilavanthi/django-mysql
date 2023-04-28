@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'dynamic_preferences',
 
-    
+
     'rest_framework_simplejwt.token_blacklist',
 
     'rest_framework',
@@ -80,6 +80,10 @@ INSTALLED_APPS += [ 'corsheaders',]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",
+
+]
 # CORS_ORIGIN_WHITELIST = (
 #   'http://localhost:8000',
 # )

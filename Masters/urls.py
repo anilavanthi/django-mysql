@@ -4,14 +4,14 @@ from . import views
 
 urlpatterns = [
 
-    path('country/', views.CountryRegisterView.as_view(), name="countryAddUpdateList"),
-    path('country/<int:id>', views.CountryRegisterView.as_view(), name="countryListDelete"),
-
     # path('countryadd/', views.CountryRegisterView.as_view(), name="countryadd"),
     # path('countrylist/', views.CountryRegisterView.as_view(), name="countrylist"),
     # path('countrylist/<int:id>', views.CountryRegisterView.as_view(), name="countrylist"),
     # path('country/update', views.CountryRegisterView.as_view(), name="countryupdatedelete"),
     # path('countrydelete/<int:id>', views.CountryRegisterView.as_view(), name="countrylist"),
+
+    path('country/', views.CountryRegisterView.as_view(), name="countryAddUpdateList"),
+    path('country/<int:id>', views.CountryRegisterView.as_view(), name="countryListDelete"),
 
     path('stateadd/', views.StateRegisterView.as_view(), name="stateadd"),
     path('statelist/', views.StateRegisterView.as_view(), name="statelist"),
@@ -26,37 +26,34 @@ urlpatterns = [
     path('citylist/', views.CityRegisterView.as_view(), name="citylist"),
     path('citylist/<int:id>', views.CityRegisterView.as_view(), name="citylist"),
 
-    path('branchadd/', views.BranchRegisterView.as_view(), name="branchadd"),
-    path('branchlist/', views.BranchRegisterView.as_view(), name="branchlist"),
-    path('branchlist/<int:id>', views.BranchRegisterView.as_view(), name="branchlist"),
+    path('branch/', views.BranchRegisterView.as_view(), name="branchAddUpdateList"),
+    path('branch/<int:id>', views.BranchRegisterView.as_view(), name="branchListDelete"),
 
-    path('religionadd/', views.ReligionRegisterView.as_view(), name="religionadd"),
-    path('religionlist/', views.ReligionRegisterView.as_view(), name="religionlist"),
-    path('religionlist/<int:id>', views.ReligionRegisterView.as_view(), name="religionlist"),
+    path('religion/', views.ReligionRegisterView.as_view(), name="religionAddUpdateList"),
+    path('religion/<int:id>', views.ReligionRegisterView.as_view(), name="religionListDelete"),
 
-    path('casteadd/', views.CasteRegisterView.as_view(), name="casteadd"),
-    path('castelist/', views.CasteRegisterView.as_view(), name="castelist"),
-    path('castelist/<int:id>', views.CasteRegisterView.as_view(), name="castelist"),
+    path('caste/', views.CasteRegisterView.as_view(), name="casteAddUpdateList"),
+    path('caste/<int:id>', views.CasteRegisterView.as_view(), name="casteListDelete"),
 
     path('subcasteadd/', views.SubCasteRegisterView.as_view(), name="subcasteadd"),
     path('subcastelist/', views.SubCasteRegisterView.as_view(), name="subcastelist"),
     path('subcastelist/<int:id>', views.SubCasteRegisterView.as_view(), name="subcastelist"),
 
-    path('occupationadd/', views.OccupationRegisterView.as_view(), name="occupationadd"),
-    path('occupationlist/', views.OccupationRegisterView.as_view(), name="occupationlist"),
-    path('occupationlist/<int:id>', views.OccupationRegisterView.as_view(), name="occupationlist"),
+    path('occupation/', views.OccupationRegisterView.as_view(), name="occupationAddUpdateList"),
+    path('occupation/<int:id>', views.OccupationRegisterView.as_view(), name="occupationListDelete"),
 
-    path('educationadd/', views.EducationRegisterView.as_view(), name="educationadd"),
-    path('educationlist/', views.EducationRegisterView.as_view(), name="educationlist"),
-    path('educationlist/<int:id>', views.EducationRegisterView.as_view(), name="educationlist"),
+    path('education/', views.EducationRegisterView.as_view(), name="educationAddUpdateList"),
+    path('education/<int:id>', views.EducationRegisterView.as_view(), name="educationListDelete"),
 
-    path('languageadd/', views.LanguageRegisterView.as_view(), name="languageadd"),
-    path('languagelist/', views.LanguageRegisterView.as_view(), name="languagelist"),
-    path('languagelist/<int:id>', views.LanguageRegisterView.as_view(), name="languagelist"),
+    path('language/', views.LanguageRegisterView.as_view(), name="languageAddUpdateList"),
+    path('language/<int:id>', views.LanguageRegisterView.as_view(), name="languageListDelete"),
 
-    path('sourceadd/', views.SourceRegisterView.as_view(), name="sourceadd"),
-    path('sourcelist/', views.SourceRegisterView.as_view(), name="sourcelist"),
-    path('sourcelist/<int:id>', views.SourceRegisterView.as_view(), name="sourcelist"),
+    path('source/', views.SourceRegisterView.as_view(), name="sourcecAddUpdateList"),
+    path('source/<int:id>', views.SourceRegisterView.as_view(), name="sourceListDelete"),
+    #
+    # path('sourceadd/', views.SourceRegisterView.as_view(), name="sourceadd"),
+    # path('sourcelist/', views.SourceRegisterView.as_view(), name="sourcelist"),
+    # path('sourcelist/<int:id>', views.SourceRegisterView.as_view(), name="sourcelist"),
 
 ]
 

@@ -622,7 +622,7 @@ class SourceRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
     serializer_class = SourceSerializer
-
+    sources = Source.objects.all()
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -640,3 +640,52 @@ class SourceRegisterView(generics.ListCreateAPIView):
         sources = Source.objects.all()
         serializer = SourceSerializer(sources, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        try:
+            current_user = request.user
+            source_json = self.sources.filter(id=request.data['id'])
+            source_json.update(name=request.data['name'],
+                                    status=request.data['status'],
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            serializer = SourceSerializer(source_json, many=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code, 'message': 'Source Details Updated Successfully',
+                        "source_details": serializer.data, }
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+
+    def patch(self, request, id=None):
+        try:
+            current_user = request.user
+            source_json = self.sources.filter(id=id)
+            source = Source.objects.get(id=id)
+            if (source.status == 1):
+                statusValue = 0
+            else:
+                statusValue = 1
+            source_json.update(status=statusValue,
+                                modifiedby=current_user.id,
+                                modifiedon=datetime.utcnow())
+            serializer = SourceSerializer(source_json, partial=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,'message': 'Source Status Updated Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+    def delete(self, request,id=None):
+        try:
+            self.sources.filter(id=id).delete()
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': ' Source Deleted Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)

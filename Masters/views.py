@@ -92,6 +92,7 @@ class StateRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
     serializer_class = StateSerializer
+    states = State.objects.all()
     def post(self, request, *args, **kwargs):
         serializer=self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -111,10 +112,84 @@ class StateRegisterView(generics.ListCreateAPIView):
         serializer = StateSerializer(states, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
+    def put(self, request):
+        try:
+            current_user = request.user
+            state_json = self.states.filter(id=request.data['id'])
+            state_json.update(name=request.data['name'],
+                              code=request.data['code'],
+                               country=request.data['country'],
+                               status=request.data['status'],
+                               modifiedby=current_user.id,
+                               modifiedon=datetime.utcnow())
+            serializer = StateSerializer(state_json, many=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,
+                        'message': 'State Details Updated Successfully',
+                        "state_details": serializer.data, }
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+
+    def patch(self, request, id=None):
+        try:
+            current_user = request.user
+            state_json = self.states.filter(id=id)
+            state = State.objects.get(id=id)
+            if (state.status == 1):
+                statusValue = 0
+            else:
+                statusValue = 1
+            state_json.update(status=statusValue,
+                               modifiedby=current_user.id,
+                               modifiedon=datetime.utcnow())
+            serializer = StateSerializer(state_json, partial=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,
+                        'message': 'State Status Updated Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+
+    def delete(self, request, id=None):
+        try:
+            self.states.filter(id=id).delete()
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': ' state deleted successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)
+
+
+class StateCountriesView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = StateSerializer
+    states = State.objects.all()
+
+    def get(self,request,id=None):
+        if id:
+            states = State.objects.filter(country=id)
+            serializer = StateSerializer(states,many=True)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        states = State.objects.all()
+        serializer = StateSerializer(states, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+
+
 class DistrictRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
     serializer_class = DistrictSerializer
+    districts = District.objects.all()
     def post(self, request, *args, **kwargs):
         serializer=self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -134,11 +209,66 @@ class DistrictRegisterView(generics.ListCreateAPIView):
         serializer = DistrictSerializer(districts, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
+    def put(self, request):
+        try:
+            current_user = request.user
+            district_json = self.districts.filter(id=request.data['id'])
+            district_json.update(name=request.data['name'],
+                              code=request.data['code'],
+                               country=request.data['country'],
+                               state=request.data['state'],
+                               status=request.data['status'],
+                               modifiedby=current_user.id,
+                               modifiedon=datetime.utcnow())
+            serializer = DistrictSerializer(district_json, many=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,
+                        'message': 'District Details Updated Successfully',
+                        "district_details": serializer.data, }
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+
+    def patch(self, request, id=None):
+        try:
+            current_user = request.user
+            district_json = self.districts.filter(id=id)
+            district = District.objects.get(id=id)
+            if (district.status == 1):
+                statusValue = 0
+            else:
+                statusValue = 1
+            district_json.update(status=statusValue,
+                               modifiedby=current_user.id,
+                               modifiedon=datetime.utcnow())
+            serializer = DistrictSerializer(district_json, partial=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,
+                        'message': 'District Status Updated Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+
+    def delete(self, request, id=None):
+        try:
+            self.districts.filter(id=id).delete()
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': ' district deleted successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)
 
 class CityRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
     serializer_class = CitySerializer
+    cities = City.objects.all()
     def post(self, request, *args, **kwargs):
         serializer=self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

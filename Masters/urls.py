@@ -13,18 +13,19 @@ urlpatterns = [
     path('country/', views.CountryRegisterView.as_view(), name="countryAddUpdateList"),
     path('country/<int:id>', views.CountryRegisterView.as_view(), name="countryListDelete"),
 
-    path('stateadd/', views.StateRegisterView.as_view(), name="stateadd"),
-    path('statelist/', views.StateRegisterView.as_view(), name="statelist"),
-    path('statelist/<int:id>', views.StateRegisterView.as_view(), name="statelist"),
+    path('state/', views.StateRegisterView.as_view(), name="stateAddUpdateList"),
+    path('state/<int:id>', views.StateRegisterView.as_view(), name="stateListDelete"),
+    path('statecountries/<int:id>', views.StateCountriesView.as_view(), name="stateListCountries"),
 
+    path('district/', views.DistrictRegisterView.as_view(), name="districtAddUpdateList"),
+    path('district/<int:id>', views.DistrictRegisterView.as_view(), name="districtListDelete"),
 
-    path('districtadd/', views.DistrictRegisterView.as_view(), name="districtadd"),
-    path('districtlist/', views.DistrictRegisterView.as_view(), name="districtlist"),
-    path('districtlist/<int:id>', views.DistrictRegisterView.as_view(), name="districtlist"),
+    path('city/', views.CityRegisterView.as_view(), name="cityAddUpdateList"),
+    path('city/<int:id>', views.CityRegisterView.as_view(), name="cityListDelete"),
 
-    path('cityadd/', views.CityRegisterView.as_view(), name="cityadd"),
-    path('citylist/', views.CityRegisterView.as_view(), name="citylist"),
-    path('citylist/<int:id>', views.CityRegisterView.as_view(), name="citylist"),
+    # path('cityadd/', views.CityRegisterView.as_view(), name="cityadd"),
+    # path('citylist/', views.CityRegisterView.as_view(), name="citylist"),
+    # path('citylist/<int:id>', views.CityRegisterView.as_view(), name="citylist"),
 
     path('branch/', views.BranchRegisterView.as_view(), name="branchAddUpdateList"),
     path('branch/<int:id>', views.BranchRegisterView.as_view(), name="branchListDelete"),
@@ -50,10 +51,6 @@ urlpatterns = [
 
     path('source/', views.SourceRegisterView.as_view(), name="sourcecAddUpdateList"),
     path('source/<int:id>', views.SourceRegisterView.as_view(), name="sourceListDelete"),
-    #
-    # path('sourceadd/', views.SourceRegisterView.as_view(), name="sourceadd"),
-    # path('sourcelist/', views.SourceRegisterView.as_view(), name="sourcelist"),
-    # path('sourcelist/<int:id>', views.SourceRegisterView.as_view(), name="sourcelist"),
 
 ]
 

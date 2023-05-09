@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.fields import ReadOnlyField
+
 from Masters.models import State,District,City,Country,Branch,Religion,Caste,SubCaste,Occupation,Education,Language,Source
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -12,6 +14,7 @@ class CountrySerializer(serializers.ModelSerializer):
 		return attrs
 
 class StateSerializer(serializers.ModelSerializer):
+	country_name = ReadOnlyField(source='country.name')
 	class Meta:
 		model = State
 		fields = '__all__'
@@ -22,6 +25,8 @@ class StateSerializer(serializers.ModelSerializer):
 		return attrs
 
 class DistrictSerializer(serializers.ModelSerializer):
+	country_name = ReadOnlyField(source='country.name')
+	state_name = ReadOnlyField(source='state.name')
 	class Meta:
 		model = District
 		fields = '__all__'
@@ -33,6 +38,9 @@ class DistrictSerializer(serializers.ModelSerializer):
 
 
 class CitySerializer(serializers.ModelSerializer):
+	country_name = ReadOnlyField(source='country.name')
+	state_name = ReadOnlyField(source='state.name')
+	district_name = ReadOnlyField(source='district.name')
 	class Meta:
 		model = City
 		fields = '__all__'

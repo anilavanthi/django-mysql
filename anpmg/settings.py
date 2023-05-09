@@ -22,9 +22,9 @@ DEBUG =False
 
 
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,172.31.7.244").split(",")
+# ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,172.31.7.244").split(",")
 
-
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 

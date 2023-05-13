@@ -20,13 +20,19 @@ class CountryRegisterView(generics.ListCreateAPIView):
     serializer_class = CountrySerializer
     countries = Country.objects.all()
     def post(self, request, *args, **kwargs):
-        serializer=self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        country=serializer.save()
-        return Response({
-            "country":CountrySerializer(country, context=self.get_serializer_context()).data,
-            "message":"country created successfully"
-        })
+        try:
+            serializer=self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            country=serializer.save()
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,
+                        'message': 'Country Created Successfully',
+                        'country':CountrySerializer(country, context=self.get_serializer_context()).data, }
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'Adding Failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
     def get(self,request,id=None):
         if id:
             country = Country.objects.get(id=id)
@@ -264,6 +270,24 @@ class DistrictRegisterView(generics.ListCreateAPIView):
                         'message': str(error)}
         return Response(response, status=status_code)
 
+
+class DistrictStateCountriesView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = DistrictSerializer
+    district = District.objects.all()
+
+    def get(self,request,id=None):
+        if id:
+            districts = District.objects.filter(state=id)
+            serializer = DistrictSerializer(districts,many=True)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        districts = District.objects.all()
+        serializer = DistrictSerializer(districts, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+
 class CityRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
@@ -287,6 +311,63 @@ class CityRegisterView(generics.ListCreateAPIView):
         cities = City.objects.all()
         serializer = CitySerializer(cities, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        try:
+            current_user = request.user
+            city_json = self.cities.filter(id=request.data['id'])
+            city_json.update(name=request.data['name'],
+                              code=request.data['code'],
+                               country=request.data['country'],
+                               state=request.data['state'],
+                                district=request.data['district'],
+                               status=request.data['status'],
+                               modifiedby=current_user.id,
+                               modifiedon=datetime.utcnow())
+            serializer = CitySerializer(city_json, many=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,
+                        'message': 'City Details Updated Successfully',
+                        "city_details": serializer.data, }
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+
+    def patch(self, request, id=None):
+        try:
+            current_user = request.user
+            city_json = self.cities.filter(id=id)
+            city = City.objects.get(id=id)
+            if (city.status == 1):
+                statusValue = 0
+            else:
+                statusValue = 1
+            city_json.update(status=statusValue,
+                               modifiedby=current_user.id,
+                               modifiedon=datetime.utcnow())
+            serializer = CitySerializer(city_json, partial=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,
+                        'message': 'City Status Updated Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+
+    def delete(self, request, id=None):
+        try:
+            self.cities.filter(id=id).delete()
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': ' city deleted successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)
+
 
 
 class BranchRegisterView(generics.ListCreateAPIView):
@@ -512,6 +593,7 @@ class SubCasteRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
     serializer_class = SubCasteSerializer
+    subcastes = SubCaste.objects.all()
     def post(self, request, *args, **kwargs):
         serializer=self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -529,6 +611,58 @@ class SubCasteRegisterView(generics.ListCreateAPIView):
         subcastes = SubCaste.objects.all()
         serializer = SubCasteSerializer(subcastes, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        try:
+            current_user = request.user
+            subcaste_json = self.subcastes.filter(id=request.data['id'])
+            subcaste_json.update(name=request.data['name'],
+                                 caste=request.data['caste'],
+                                    status=request.data['status'],
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            serializer = SubCasteSerializer(subcaste_json, many=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code, 'message': 'Sub Caste Details Updated Successfully',
+                        "sub-caste_details": serializer.data, }
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+
+    def patch(self, request, id=None):
+        try:
+            current_user = request.user
+            subcaste_json = self.subcastes.filter(id=id)
+            subcaste = SubCaste.objects.get(id=id)
+            if (subcaste.status == 1):
+                statusValue = 0
+            else:
+                statusValue = 1
+            subcaste_json.update(status=statusValue,
+                                modifiedby=current_user.id,
+                                modifiedon=datetime.utcnow())
+            serializer = SubCasteSerializer(subcaste_json, partial=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,
+                        'message': 'Sub Caste Status Updated Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+    def delete(self, request,id=None):
+        try:
+            self.subcastes.filter(id=id).delete()
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': 'Sub Caste Deleted Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)
+
 
 class OccupationRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]

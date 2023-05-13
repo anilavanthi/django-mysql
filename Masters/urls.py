@@ -19,13 +19,10 @@ urlpatterns = [
 
     path('district/', views.DistrictRegisterView.as_view(), name="districtAddUpdateList"),
     path('district/<int:id>', views.DistrictRegisterView.as_view(), name="districtListDelete"),
+    path('districtstatecountries/<int:id>', views.DistrictStateCountriesView.as_view(), name="districtstateListCountries"),
 
     path('city/', views.CityRegisterView.as_view(), name="cityAddUpdateList"),
     path('city/<int:id>', views.CityRegisterView.as_view(), name="cityListDelete"),
-
-    # path('cityadd/', views.CityRegisterView.as_view(), name="cityadd"),
-    # path('citylist/', views.CityRegisterView.as_view(), name="citylist"),
-    # path('citylist/<int:id>', views.CityRegisterView.as_view(), name="citylist"),
 
     path('branch/', views.BranchRegisterView.as_view(), name="branchAddUpdateList"),
     path('branch/<int:id>', views.BranchRegisterView.as_view(), name="branchListDelete"),
@@ -36,9 +33,8 @@ urlpatterns = [
     path('caste/', views.CasteRegisterView.as_view(), name="casteAddUpdateList"),
     path('caste/<int:id>', views.CasteRegisterView.as_view(), name="casteListDelete"),
 
-    path('subcasteadd/', views.SubCasteRegisterView.as_view(), name="subcasteadd"),
-    path('subcastelist/', views.SubCasteRegisterView.as_view(), name="subcastelist"),
-    path('subcastelist/<int:id>', views.SubCasteRegisterView.as_view(), name="subcastelist"),
+    path('subcaste/', views.SubCasteRegisterView.as_view(), name="subcasteAddUpdateList"),
+    path('subcaste/<int:id>', views.SubCasteRegisterView.as_view(), name="subcasteListDelete"),
 
     path('occupation/', views.OccupationRegisterView.as_view(), name="occupationAddUpdateList"),
     path('occupation/<int:id>', views.OccupationRegisterView.as_view(), name="occupationListDelete"),

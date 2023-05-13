@@ -84,6 +84,7 @@ class CasteSerializer(serializers.ModelSerializer):
 		return attrs
 
 class SubCasteSerializer(serializers.ModelSerializer):
+	caste_name = ReadOnlyField(source='caste.name')
 	class Meta:
 		model = SubCaste
 		fields = '__all__'

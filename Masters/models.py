@@ -4,6 +4,8 @@ from django.conf import settings
 from Common.utils import getcode
 import datetime
 
+from Users.models import User
+
 
 class Country(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
@@ -263,6 +265,43 @@ class Source(models.Model):
         return self.name
 
 
+class Staff(models.Model):
+    id = models.AutoField(primary_key=True, auto_created=True)
+    gender = models.CharField(max_length=15, null=True, blank=True)
+    maritalStatus = models.CharField(max_length=15, null=True, blank=True)
+    officeMobile = models.CharField(max_length=15, db_index=True, blank=True)
+    pemail = models.EmailField(max_length=255, db_index=True, blank=True, null=True)
+    branch = models.ForeignKey('Masters.Branch', related_name='staff', on_delete=models.RESTRICT, null=True, blank=True)
+    religion = models.ForeignKey('Masters.Religion', related_name='staff', on_delete=models.RESTRICT, null=True, blank=True)
+    caste = models.ForeignKey('Masters.Caste', related_name='staff', on_delete=models.RESTRICT, null=True,blank=True)
+    # branch = models.CharField(max_length=100, null=True, blank=True)
+    # religion = models.CharField(max_length=100, null=True, blank=True)
+    # caste = models.CharField(max_length=100, null=True, blank=True)
+    eduType = models.CharField(max_length=100, null=True, blank=True)
+    qual = models.CharField(max_length=100, null=True, blank=True)
+    aadharno = models.CharField(max_length=15, null=True, blank=True)
+    fname= models.CharField(max_length=50, null=True, blank=True)
+    fmobile = models.CharField(max_length=15, db_index=True, blank=True)
+    faddress = models.TextField(blank=True, null=True)
+    refname = models.CharField(max_length=50, null=True, blank=True)
+    refmobile = models.CharField(max_length=15, db_index=True, blank=True)
+    refaddress = models.TextField(blank=True, null=True)
+    dob = models.CharField(max_length=50, null=True, blank=True)
+    jdate = models.CharField(max_length=50, null=True, blank=True)
+    source = models.CharField(max_length=50, null=True, blank=True)
+    pexp = models.CharField(max_length=5, null=True, blank=True)
+    user = models.ForeignKey(User, related_name='users', on_delete=models.RESTRICT, null=True)
+    createdon = models.DateTimeField(auto_now_add=True, blank=True)
+    createdby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='staffcreated', on_delete=models.RESTRICT, null=True)
+    modifiedon = models.DateTimeField(blank=True, null=True, auto_now=True)
+    modifiedby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='staffupdated', on_delete=models.RESTRICT,  null=True)
+    status = models.SmallIntegerField(default=1, null=True)
+
+    def save(self, *args, **kwargs):
+        super(Staff, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 

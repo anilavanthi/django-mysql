@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from rest_framework import generics, status, views, permissions
 
 from Masters.models import Country, State, District, City, Branch, Religion, Caste, SubCaste, Occupation, Education, \
-    Language, Source
+    Language, Source, Staff
 from Masters.serializers import StateSerializer, DistrictSerializer, CitySerializer, CountrySerializer, \
     BranchSerializer, ReligionSerializer, \
-    CasteSerializer, SubCasteSerializer, OccupationSerializer, EducationSerializer, LanguageSerializer, SourceSerializer
+    CasteSerializer, SubCasteSerializer, OccupationSerializer, EducationSerializer, LanguageSerializer, SourceSerializer, StaffSerializer
 
 
 # Create your views here.
@@ -285,6 +285,23 @@ class DistrictStateCountriesView(generics.ListCreateAPIView):
 
         districts = District.objects.all()
         serializer = DistrictSerializer(districts, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+
+class CityDistrictStateCountriesView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = DistrictSerializer
+    city = City.objects.all()
+
+    def get(self,request,id=None):
+        if id:
+            cities = City.objects.filter(district=id)
+            serializer = CitySerializer(cities,many=True)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        cities = City.objects.all()
+        serializer = CitySerializer(cities, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -953,3 +970,27 @@ class SourceRegisterView(generics.ListCreateAPIView):
             response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
                         'message': str(error)}
         return Response(response, status=status_code)
+
+class StaffRegisterView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = StaffSerializer
+    staff = Staff.objects.all()
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        staff = serializer.save()
+        return Response({
+            "staff": StaffSerializer(staff, context=self.get_serializer_context()).data,
+            "message": "Staff created successfully"
+        })
+
+    def get(self, request, id=None):
+        if id:
+            staff = Staff.objects.get(id=id)
+            serializer = StaffSerializer(staff)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        staffall = Staff.objects.all()
+        serializer = StaffSerializer(staffall, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)

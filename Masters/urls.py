@@ -23,6 +23,7 @@ urlpatterns = [
 
     path('city/', views.CityRegisterView.as_view(), name="cityAddUpdateList"),
     path('city/<int:id>', views.CityRegisterView.as_view(), name="cityListDelete"),
+    path('citydistrictstatecountries/<int:id>', views.CityDistrictStateCountriesView.as_view(),name="citydistrictstateListCountries"),
 
     path('branch/', views.BranchRegisterView.as_view(), name="branchAddUpdateList"),
     path('branch/<int:id>', views.BranchRegisterView.as_view(), name="branchListDelete"),
@@ -48,5 +49,7 @@ urlpatterns = [
     path('source/', views.SourceRegisterView.as_view(), name="sourcecAddUpdateList"),
     path('source/<int:id>', views.SourceRegisterView.as_view(), name="sourceListDelete"),
 
+    path('staff/', views.StaffRegisterView.as_view(), name="staffAddUpdateList"),
+    path('staff/<int:id>', views.StaffRegisterView.as_view(), name="staffListDelete"),
 ]
 

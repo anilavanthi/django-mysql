@@ -2,6 +2,9 @@ from rest_framework import serializers
 from rest_framework.fields import ReadOnlyField
 
 from Masters.models import State,District,City,Country,Branch,Religion,Caste,SubCaste,Occupation,Education,Language,Source
+from Users.serializers import UserCommonSerializer
+from Users.models import User
+from Masters.models import Staff
 
 class CountrySerializer(serializers.ModelSerializer):
 	class Meta:
@@ -136,3 +139,15 @@ class SourceSerializer(serializers.ModelSerializer):
 		attrs['createdby'] = self.context['request'].user
 		return attrs
 
+class StaffSerializer(serializers.ModelSerializer):
+	user = UserCommonSerializer()
+
+	class Meta:
+		model = Staff
+		fields = '__all__'
+
+	def create(self,validate_data):
+		user_data = validate_data.pop('user')
+		user = User.objects.create(**user_data)
+		staff = Staff.objects.create(user=user,**validate_data)
+		return staff

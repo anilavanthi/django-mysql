@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from rest_framework import serializers
+from rest_framework.fields import ReadOnlyField
+
 from Common.Constants import SMS,Email
 from django.conf import settings
 from Common.utils import Util
@@ -29,11 +31,17 @@ import jwt
 
 
 class UserCommonSerializer(serializers.ModelSerializer):
-    
+    state_name = ReadOnlyField(source='state.name')
+    district_name = ReadOnlyField(source='district.name')
+    city_name = ReadOnlyField(source='city.name')
     class Meta:
         model = User
         # fields = ('username','email','phone','first_name','last_name','state','district','city','address')
         fields = '__all__'
+
+    createdby = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    modifiedby = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
 
 class UserMiniSerializer(serializers.ModelSerializer):
     

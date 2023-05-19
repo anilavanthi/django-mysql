@@ -55,15 +55,21 @@ class CitySerializer(serializers.ModelSerializer):
 
 
 class BranchSerializer(serializers.ModelSerializer):
+	user = UserCommonSerializer()
 	class Meta:
 		model = Branch
 		fields = '__all__'
-		read_only_fields = ['user']
+	def create(self,validate_data):
+		user_data = validate_data.pop('user')
+		user = User.objects.create(**user_data)
+		branch = Branch.objects.create(user=user,**validate_data)
+		return branch
 
-	def validate(self, attrs):
-		attrs['createdby'] = self.context['request'].user
-		return attrs
-
+	def update(self,validate_data):
+		user_data = validate_data.pop('user')
+		user=User.objects.update(**user_data)
+		branch=Branch.objects.update(user=user,**validate_data)
+		return branch
 
 class ReligionSerializer(serializers.ModelSerializer):
 	class Meta:

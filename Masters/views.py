@@ -7,10 +7,12 @@ from rest_framework import generics, status, views, permissions
 
 from Masters.models import Country, State, District, City, Branch, Religion, Caste, SubCaste, Occupation, Education, \
     Language, Source, Staff
+from Users.models import User
 from Masters.serializers import StateSerializer, DistrictSerializer, CitySerializer, CountrySerializer, \
     BranchSerializer, ReligionSerializer, \
     CasteSerializer, SubCasteSerializer, OccupationSerializer, EducationSerializer, LanguageSerializer, SourceSerializer, StaffSerializer
 
+from Users.serializers import UserCommonSerializer
 
 # Create your views here.
 
@@ -392,14 +394,16 @@ class BranchRegisterView(generics.ListCreateAPIView):
     # permission_classes = (permissions.AllowAny,)
     serializer_class = BranchSerializer
     branches = Branch.objects.all()
+    users = User.objects.all()
     def post(self, request, *args, **kwargs):
         serializer=self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        branch=serializer.save()
+        branch=serializer.save(createdby=self.request.user, modifiedby=self.request.user)
         return Response({
             "branch":BranchSerializer(branch, context=self.get_serializer_context()).data,
             "message":"Branch created successfully"
         })
+
     def get(self,request,id=None):
         if id:
             branch = Branch.objects.get(id=id)
@@ -415,19 +419,62 @@ class BranchRegisterView(generics.ListCreateAPIView):
             current_user = request.user
             branch_json = self.branches.filter(id=request.data['id'])
             branch_json.update(name=request.data['name'],
-                                address=request.data['address'],
-                                    status=request.data['status'],
-                                    modifiedby=current_user.id,
-                                    modifiedon=datetime.utcnow())
+                             address=request.data['address'],
+                             status=request.data['status'],
+                             modifiedby=current_user.id,
+                             modifiedon=datetime.utcnow())
             serializer = BranchSerializer(branch_json, many=True)
+
+            branch = Branch.objects.get(pk=request.data['id'])
+            user = User.objects.get(pk=branch.user_id)
+            user_data = {
+                'state' : request.data['user']['state'],
+                'district': request.data['user']['district'],
+                'city' : request.data['user']['city'],
+                'phone' : request.data['user']['phone'],
+                'email' : request.data['user']['email'],
+                'username' : request.data['user']['username'],
+                'password' : request.data['user']['password'],
+            }
+            user_serializer = UserCommonSerializer(user, data=user_data, partial=True)
+            user_serializer.is_valid(raise_exception=True)
+            user_serializer.save()
             status_code = status.HTTP_201_CREATED
             response = {'status': 'success', 'status_code': status_code, 'message': 'Branch Details Updated Successfully',
-                        "branch_details": serializer.data, }
+                                "branch_details": serializer.data, }
         except Exception as error:
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
                         'system_message': str(error)}
         return Response(response, status=status_code)
+    # def put(self, request):
+    #     try:
+    #         current_user = request.user
+    #         branch_json = self.branches.filter(id=request.data['id'])
+    #         branch=Branch.objects.get(pk=request.data['id'])
+    #         user_json = self.users.filter(id=branch.user_id)
+    #         user_json.update(state=request.data['user']['state'],
+    #                          district=request.data['user']['district'],
+    #                          city=request.data['user']['city'],
+    #                          phone=request.data['user']['phone'],
+    #                          email=request.data['user']['email'],
+    #                          username=request.data['user']['username'],
+    #                          password=request.data['user']['password'])
+    #         branch_json.update(name=request.data['name'],
+    #                             address=request.data['address'],
+    #                                 status=request.data['status'],
+    #                                 user=user_json,
+    #                                 modifiedby=current_user.id,
+    #                                 modifiedon=datetime.utcnow())
+    #         serializer = BranchSerializer(branch_json, many=True)
+    #         status_code = status.HTTP_201_CREATED
+    #         response = {'status': 'success', 'status_code': status_code, 'message': 'Branch Details Updated Successfully',
+    #                     "branch_details": serializer.data, }
+    #     except Exception as error:
+    #         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    #         response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+    #                     'system_message': str(error)}
+    #     return Response(response, status=status_code)
 
     def patch(self,request,id=None):
         try:

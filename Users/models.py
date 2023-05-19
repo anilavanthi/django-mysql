@@ -65,10 +65,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_phone_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_branch = models.BooleanField(default=False)
+    is_agent = models.BooleanField(default=False)
+    is_customer = models.BooleanField(default=False)
     created_at = models.DateTimeField(default= datetime.datetime.now, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
-    createdby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='userscreated', on_delete=models.RESTRICT, null=True)
-    modifiedby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='usersupdated', on_delete=models.RESTRICT,  null=True)
+    createdby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='%(class)s_created_by', on_delete=models.RESTRICT, null=True)
+    modifiedby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='%(class)s_modified_by', on_delete=models.RESTRICT,  null=True)
 
 
     USERNAME_FIELD = 'username'

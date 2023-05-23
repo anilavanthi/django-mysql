@@ -265,6 +265,34 @@ class Source(models.Model):
     def __str__(self):
         return self.name
 
+class MemberShip(models.Model):
+    id = models.AutoField(primary_key=True, auto_created=True)
+    planname = models.CharField(max_length=100, null=True, blank=True)
+    plantype = models.CharField(max_length=100, null=True, blank=True)
+    duration = models.IntegerField(default=1, null=True)
+    contactsno=models.IntegerField(default=1, null=True)
+    amount=models.IntegerField(default=1, null=True)
+    createdon = models.DateTimeField(auto_now_add=True, blank=True)
+    createdby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='membershipcreated', on_delete=models.RESTRICT, null=True)
+    modifiedon = models.DateTimeField(blank=True, null=True, auto_now=True)
+    modifiedby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='membershipupdated', on_delete=models.RESTRICT,  null=True)
+    status = models.SmallIntegerField(default=1, null=True)
+    smsenable = models.SmallIntegerField(default=1, null=True)
+    emailenable=models.SmallIntegerField(default=1, null=True)
+    personalassistance=models.SmallIntegerField(default=1, null=True)
+    photozoom=models.SmallIntegerField(default=1, null=True)
+    sendinterest=models.SmallIntegerField(default=1, null=True)
+    profilesuggestions=models.SmallIntegerField(default=1, null=True)
+
+    def save(self, *args, **kwargs):
+        # if self.id is None and (self.code == "" or self.code == None):
+        #     self.code = getcode(Branch,'BRANCH')
+        super(MemberShip, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
 
 class Staff(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)

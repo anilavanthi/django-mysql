@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from rest_framework.fields import ReadOnlyField
 
-from Masters.models import State,District,City,Country,Branch,Religion,Caste,SubCaste,Occupation,Education,Language,Source
+from Masters.models import State, District, City, Country, Branch, Religion, Caste, SubCaste, Occupation, Education, \
+	Language, Source, MemberShip
 from Users.serializers import UserCommonSerializer
 from Users.models import User
 from Masters.models import Staff
@@ -144,6 +145,16 @@ class SourceSerializer(serializers.ModelSerializer):
 	def validate(self, attrs):
 		attrs['createdby'] = self.context['request'].user
 		return attrs
+
+class MemberShipSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = MemberShip
+		fields = '__all__'
+		# read_only_fields = ['user']
+
+	# def validate(self, attrs):
+	# 	attrs['createdby'] = self.context['request'].user
+	# 	return attrs
 
 class StaffSerializer(serializers.ModelSerializer):
 	user = UserCommonSerializer()

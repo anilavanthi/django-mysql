@@ -6,11 +6,12 @@ from rest_framework.response import Response
 from rest_framework import generics, status, views, permissions
 
 from Masters.models import Country, State, District, City, Branch, Religion, Caste, SubCaste, Occupation, Education, \
-    Language, Source, Staff
+    Language, Source, Staff, MemberShip
 from Users.models import User
 from Masters.serializers import StateSerializer, DistrictSerializer, CitySerializer, CountrySerializer, \
     BranchSerializer, ReligionSerializer, \
-    CasteSerializer, SubCasteSerializer, OccupationSerializer, EducationSerializer, LanguageSerializer, SourceSerializer, StaffSerializer
+    CasteSerializer, SubCasteSerializer, OccupationSerializer, EducationSerializer, LanguageSerializer, SourceSerializer, StaffSerializer, \
+    MemberShipSerializer
 
 from Users.serializers import UserCommonSerializer
 
@@ -1018,6 +1019,137 @@ class SourceRegisterView(generics.ListCreateAPIView):
                         'message': str(error)}
         return Response(response, status=status_code)
 
+class MemberShipRegisterView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = MemberShipSerializer
+    memberships = MemberShip.objects.all()
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        membership = serializer.save()
+        return Response({
+            "membership": MemberShipSerializer(membership, context=self.get_serializer_context()).data,
+            "message": "Membership created successfully"
+        })
+    def get(self, request, id=None):
+        if id:
+            membership = MemberShip.objects.get(id=id)
+            serializer = MemberShipSerializer(membership)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        memberships = MemberShip.objects.all()
+        serializer = MemberShipSerializer(memberships, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        try:
+            current_user = request.user
+            membership_json = self.memberships.filter(id=request.data['id'])
+            membership_json.update(planname=request.data['planname'],
+                                   plantype=request.data['plantype'],
+                                   duration=request.data['duration'],
+                                   contactsno=request.data['contactsno'],
+                                   amount=request.data['amount'],
+                                    status=request.data['status'],
+                                   smsenable=request.data['smsenable'],
+                                   emailenable=request.data['emailenable'],
+                                   personalassistance=request.data['personalassistance'],
+                                   photozoom=request.data['photozoom'],
+                                   sendinterest=request.data['sendinterest'],
+                                   profilesuggestions=request.data['profilesuggestions'],
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            serializer = MemberShipSerializer(membership_json, many=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code, 'message': 'Membership Details Updated Successfully',
+                        "source_details": serializer.data, }
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+
+    def patch(self, request, id=None, param1=None):
+        try:
+            current_user = request.user
+            membership_json = self.memberships.filter(id=id)
+            membership = MemberShip.objects.get(id=id)
+            if param1 == 'status':
+                if (membership.status == 1):
+                    statusValue = 0
+                else:
+                    statusValue = 1
+                membership_json.update(status=statusValue,
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            if param1 == 'sms':
+                if (membership.smsenable == 1):
+                    smsValue = 0
+                else:
+                    smsValue = 1
+                membership_json.update(smsenable=smsValue,
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            if param1 == 'email':
+                if (membership.emailenable == 1):
+                    emailValue = 0
+                else:
+                    emailValue = 1
+                membership_json.update(emailenable=emailValue,
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            if param1 == 'passt':
+                if (membership.personalassistance == 1):
+                    passtValue = 0
+                else:
+                    passtValue = 1
+                membership_json.update(personalassistance=passtValue,
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            if param1 == 'zoom':
+                if (membership.photozoom == 1):
+                    zoomValue = 0
+                else:
+                    zoomValue = 1
+                membership_json.update(photozoom=zoomValue,
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            if param1 == 'interest':
+                if (membership.sendinterest == 1):
+                    interestValue = 0
+                else:
+                    interestValue = 1
+                membership_json.update(sendinterest=interestValue,
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+            if param1 == 'psugg':
+                if (membership.profilesuggestions == 1):
+                    psuggValue = 0
+                else:
+                    psuggValue = 1
+                membership_json.update(profilesuggestions=psuggValue,
+                                    modifiedby=current_user.id,
+                                    modifiedon=datetime.utcnow())
+
+            serializer = MemberShipSerializer(membership_json, partial=True)
+            status_code = status.HTTP_201_CREATED
+            response = {'status': 'success', 'status_code': status_code,'message': 'MemberShip Status Updated Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status_code, "message": "something went wrong",
+                        'system_message': str(error)}
+        return Response(response, status=status_code)
+    def delete(self, request,id=None):
+        try:
+            self.memberships.filter(id=id).delete()
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': ' Memberships Deleted Successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)
 class StaffRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)

@@ -49,6 +49,10 @@ urlpatterns = [
     path('source/', views.SourceRegisterView.as_view(), name="sourcecAddUpdateList"),
     path('source/<int:id>', views.SourceRegisterView.as_view(), name="sourceListDelete"),
 
+    path('membership/', views.MemberShipRegisterView.as_view(), name="membershipAddUpdateList"),
+    path('membership/<int:id>', views.MemberShipRegisterView.as_view(), name="membershipListDelete"),
+    path('membership/<int:id>/<str:param1>', views.MemberShipRegisterView.as_view(), name="allStatusChange"),
+
     path('staff/', views.StaffRegisterView.as_view(), name="staffAddUpdateList"),
     path('staff/<int:id>', views.StaffRegisterView.as_view(), name="staffListDelete"),
 ]

@@ -52,13 +52,14 @@ urlpatterns = [
 
 ] 
 if  settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) # Workes Only in Development    
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) # Workes Only in Development
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Workes Only in Development
 else:
     urlpatterns += [ path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT}),]
 
-if not settings.USE_S3:
-    # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Workes Only in Development
-    urlpatterns += [ path(settings.MEDIA_URL+'<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),] 
+# if not settings.USE_S3:
+#     # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Workes Only in Development
+#     urlpatterns += [ path(settings.MEDIA_URL+'<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),]
 
 urlpatterns += [ 
 

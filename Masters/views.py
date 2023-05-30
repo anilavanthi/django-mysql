@@ -1,7 +1,11 @@
+import json
+import os
 from datetime import datetime
-
+from django.utils.text import slugify
 from django.shortcuts import render
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.files.storage import FileSystemStorage
 from rest_framework.response import Response
 from rest_framework import generics, status, views, permissions
 
@@ -1155,10 +1159,23 @@ class StaffRegisterView(generics.ListCreateAPIView):
     # permission_classes = (permissions.AllowAny,)
     serializer_class = StaffSerializer
     staff = Staff.objects.all()
+    users = User.objects.all()
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        parser_classes = (MultiPartParser, FormParser)
+        photo = request.FILES["photo"]
+        data = json.loads(request.data['data'])
+
+        original_filename, extension = os.path.splitext(photo.name)
+        # file_name = slugify(data['user']['username'])
+        photo.name =data['user']['username'] + extension
+        # # fss = FileSystemStorage()
+        # # file = fss.save(upload.name, upload)
+        serializer = self.get_serializer(data=data)
+        # serializer.is_valid(raise_exception=True)
+        # staff = serializer.save()
+        # serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        staff = serializer.save()
+        staff = serializer.save(photo=photo)
         return Response({
             "staff": StaffSerializer(staff, context=self.get_serializer_context()).data,
             "message": "Staff created successfully"
@@ -1173,3 +1190,22 @@ class StaffRegisterView(generics.ListCreateAPIView):
         staffall = Staff.objects.all()
         serializer = StaffSerializer(staffall, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    def delete(self, request,id=None):
+        try:
+            staff = Staff.objects.get(id=id)
+            photo_path = staff.photo.url
+            self.staff.filter(id=id).delete()
+            self.users.filter(id=staff.user_id).delete()
+            # if photo_path:
+            #     try:
+            #         os.remove(photo_path)
+            #     except FileNotFoundError:
+            #         pass  # Image file doesn't exist
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': ' staff deleted successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)

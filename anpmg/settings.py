@@ -266,10 +266,13 @@ if USE_S3:
     # AWS S3 Configrations
     INSTALLED_APPS += ['storages']
     
-    AWS_ACCESS_KEY_ID = 'AKIA5BNOEKQKSVQ2B2TR'
-    AWS_SECRET_ACCESS_KEY = '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'
-    AWS_STORAGE_BUCKET_NAME = 'wheelsmart'
-    WHEELSMART_DOMAIN = 'app.wheelsmart.in'
+    # AWS_ACCESS_KEY_ID = 'AKIA5BNOEKQKSVQ2B2TR'
+    AWS_ACCESS_KEY_ID = 'AKIAXPVZG5UPGRPNXU5Z'
+    # AWS_SECRET_ACCESS_KEY = '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'
+    AWS_SECRET_ACCESS_KEY = 'yKcxFLgSa91PoVFWnFIFqh6fmKXj2nFY282lpr++'
+    # AWS_STORAGE_BUCKET_NAME = 'wheelsmart'
+    AWS_STORAGE_BUCKET_NAME = 'annapurnamatrimony'
+    # WHEELSMART_DOMAIN = 'app.wheelsmart.in'
     AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
     # ap-south-1

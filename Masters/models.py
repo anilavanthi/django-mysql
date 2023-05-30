@@ -292,7 +292,8 @@ class MemberShip(models.Model):
     def __str__(self):
         return self.name
 
-
+def images_upload_to(instance, filename):
+    return 'images/{filename}'.format(filename=filename)
 
 class Staff(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
@@ -325,7 +326,7 @@ class Staff(models.Model):
     modifiedon = models.DateTimeField(blank=True, null=True, auto_now=True)
     modifiedby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='staffupdated', on_delete=models.RESTRICT,  null=True)
     status = models.SmallIntegerField(default=1, null=True)
-
+    photo = models.ImageField(upload_to=images_upload_to,default='bill_pic',  blank=True, null=True)
     def save(self, *args, **kwargs):
         super(Staff, self).save(*args, **kwargs)
 

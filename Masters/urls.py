@@ -55,5 +55,9 @@ urlpatterns = [
 
     path('staff/', views.StaffRegisterView.as_view(), name="staffAddUpdateList"),
     path('staff/<int:id>', views.StaffRegisterView.as_view(), name="staffListDelete"),
+
+    path('agent/', views.AgentRegisterView.as_view(), name="agentAddUpdateList"),
+    path('agent/<int:id>', views.AgentRegisterView.as_view(), name="agentListDelete"),
+
 ]
 

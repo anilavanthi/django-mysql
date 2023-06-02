@@ -10,12 +10,12 @@ from rest_framework.response import Response
 from rest_framework import generics, status, views, permissions
 
 from Masters.models import Country, State, District, City, Branch, Religion, Caste, SubCaste, Occupation, Education, \
-    Language, Source, Staff, MemberShip
+    Language, Source, Staff, MemberShip, Agent
 from Users.models import User
 from Masters.serializers import StateSerializer, DistrictSerializer, CitySerializer, CountrySerializer, \
     BranchSerializer, ReligionSerializer, \
     CasteSerializer, SubCasteSerializer, OccupationSerializer, EducationSerializer, LanguageSerializer, SourceSerializer, StaffSerializer, \
-    MemberShipSerializer
+    MemberShipSerializer,AgentSerializer
 
 from Users.serializers import UserCommonSerializer
 
@@ -1204,6 +1204,50 @@ class StaffRegisterView(generics.ListCreateAPIView):
             #         pass  # Image file doesn't exist
             status_code = status.HTTP_200_OK
             response = {'status': 'success', 'status_code': status_code, 'message': ' staff deleted successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)
+
+class AgentRegisterView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = AgentSerializer
+    agent = Agent.objects.all()
+    users = User.objects.all()
+    def post(self, request, *args, **kwargs):
+        parser_classes = (MultiPartParser, FormParser)
+        photo = request.FILES["photo"]
+        data = json.loads(request.data['data'])
+        original_filename, extension = os.path.splitext(photo.name)
+        photo.name =data['user']['username'] + extension
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        agent = serializer.save(photo=photo)
+        return Response({
+            "agent": AgentSerializer(agent, context=self.get_serializer_context()).data,
+            "message": "Agent created successfully"
+        })
+
+    def get(self, request, id=None):
+        if id:
+            agent = Agent.objects.get(id=id)
+            serializer = AgentSerializer(agent)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        agentall = Agent.objects.all()
+        serializer = AgentSerializer(agentall, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    def delete(self, request,id=None):
+        try:
+            agent = Agent.objects.get(id=id)
+            photo_path = agent.photo.url
+            self.agent.filter(id=id).delete()
+            self.users.filter(id=agent.user_id).delete()
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': 'agent deleted successfully'}
         except Exception as error:
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,

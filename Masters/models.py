@@ -304,11 +304,13 @@ class Staff(models.Model):
     branch = models.ForeignKey('Masters.Branch', related_name='staff', on_delete=models.RESTRICT, null=True, blank=True)
     religion = models.ForeignKey('Masters.Religion', related_name='staff', on_delete=models.RESTRICT, null=True, blank=True)
     caste = models.ForeignKey('Masters.Caste', related_name='staff', on_delete=models.RESTRICT, null=True,blank=True)
+    education = models.ForeignKey('Masters.Education', related_name='staff', on_delete=models.RESTRICT, null=True,blank=True)
+    source = models.ForeignKey('Masters.Source', related_name='staff', on_delete=models.RESTRICT, null=True,blank=True)
     # branch = models.CharField(max_length=100, null=True, blank=True)
     # religion = models.CharField(max_length=100, null=True, blank=True)
     # caste = models.CharField(max_length=100, null=True, blank=True)
     eduType = models.CharField(max_length=100, null=True, blank=True)
-    qual = models.CharField(max_length=100, null=True, blank=True)
+    # qual = models.CharField(max_length=100, null=True, blank=True)
     aadharno = models.CharField(max_length=15, null=True, blank=True)
     fname= models.CharField(max_length=50, null=True, blank=True)
     fmobile = models.CharField(max_length=15, db_index=True, blank=True)
@@ -318,7 +320,7 @@ class Staff(models.Model):
     refaddress = models.TextField(blank=True, null=True)
     dob = models.CharField(max_length=50, null=True, blank=True)
     jdate = models.CharField(max_length=50, null=True, blank=True)
-    source = models.CharField(max_length=50, null=True, blank=True)
+    # source = models.CharField(max_length=50, null=True, blank=True)
     pexp = models.CharField(max_length=5, null=True, blank=True)
     user = models.ForeignKey(User, related_name='staff_users', on_delete=models.RESTRICT, null=True)
     createdon = models.DateTimeField(auto_now_add=True, blank=True)
@@ -334,7 +336,31 @@ class Staff(models.Model):
         return self.name
 
 
+def agents_upload_to(instance, filename):
+    return 'images/agents/{filename}'.format(filename=filename)
+class Agent(models.Model):
+    id = models.AutoField(primary_key=True, auto_created=True)
+    gender = models.CharField(max_length=15, null=True, blank=True)
+    maritalStatus = models.CharField(max_length=15, null=True, blank=True)
+    education = models.ForeignKey('Masters.Education', related_name='agent', on_delete=models.RESTRICT, null=True,blank=True)
+    aadharno = models.CharField(max_length=15, null=True, blank=True)
+    dob = models.CharField(max_length=50, null=True, blank=True)
+    bankaccno= models.CharField(max_length=15, null=True, blank=True)
+    bankname = models.CharField(max_length=50,  null=True, blank=True)
+    bankifsccode = models.CharField(max_length=15,  null=True, blank=True)
+    bankbranchname = models.CharField(max_length=50, null=True, blank=True)
+    user = models.ForeignKey(User, related_name='agent_users', on_delete=models.RESTRICT, null=True)
+    createdon = models.DateTimeField(auto_now_add=True, blank=True)
+    createdby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='agentcreated', on_delete=models.RESTRICT, null=True)
+    modifiedon = models.DateTimeField(blank=True, null=True, auto_now=True)
+    modifiedby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='agentupdated', on_delete=models.RESTRICT,  null=True)
+    status = models.SmallIntegerField(default=1, null=True)
+    photo = models.ImageField(upload_to=agents_upload_to,default='blank_pic',  blank=True, null=True)
+    def save(self, *args, **kwargs):
+        super(Agent, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
 
 
     

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.fields import ReadOnlyField
 
 from Masters.models import State, District, City, Country, Branch, Religion, Caste, SubCaste, Occupation, Education, \
-	Language, Source, MemberShip
+	Language, Source, MemberShip, Agent
 from Users.serializers import UserCommonSerializer
 from Users.models import User
 from Masters.models import Staff
@@ -158,7 +158,11 @@ class MemberShipSerializer(serializers.ModelSerializer):
 
 class StaffSerializer(serializers.ModelSerializer):
 	user = UserCommonSerializer()
-
+	education_name = ReadOnlyField(source='education.name')
+	source_name = ReadOnlyField(source='source.name')
+	branch_name = ReadOnlyField(source='branch.name')
+	religion_name = ReadOnlyField(source='religion.name')
+	caste_name = ReadOnlyField(source='caste.name')
 	class Meta:
 		model = Staff
 		fields = '__all__'
@@ -168,3 +172,16 @@ class StaffSerializer(serializers.ModelSerializer):
 		user = User.objects.create(**user_data)
 		staff = Staff.objects.create(user=user,**validate_data)
 		return staff
+
+class AgentSerializer(serializers.ModelSerializer):
+	user = UserCommonSerializer()
+	education_name = ReadOnlyField(source='education.name')
+	class Meta:
+		model = Agent
+		fields = '__all__'
+
+	def create(self,validate_data):
+		user_data = validate_data.pop('user')
+		user = User.objects.create(**user_data)
+		agent = Agent.objects.create(user=user,**validate_data)
+		return agent

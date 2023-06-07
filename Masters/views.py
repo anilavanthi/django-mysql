@@ -8,7 +8,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.files.storage import FileSystemStorage
 from rest_framework.response import Response
 from rest_framework import generics, status, views, permissions
-
+from django.contrib.auth.hashers import make_password
 from Masters.models import Country, State, District, City, Branch, Religion, Caste, SubCaste, Occupation, Education, \
     Language, Source, Staff, MemberShip, Agent
 from Users.models import User
@@ -1164,7 +1164,8 @@ class StaffRegisterView(generics.ListCreateAPIView):
         parser_classes = (MultiPartParser, FormParser)
         photo = request.FILES["photo"]
         data = json.loads(request.data['data'])
-
+        passwordNew = make_password(data['user']['password'])
+        data['user']['password']=passwordNew
         original_filename, extension = os.path.splitext(photo.name)
         # file_name = slugify(data['user']['username'])
         photo.name =data['user']['username'] + extension
@@ -1220,6 +1221,8 @@ class AgentRegisterView(generics.ListCreateAPIView):
         parser_classes = (MultiPartParser, FormParser)
         photo = request.FILES["photo"]
         data = json.loads(request.data['data'])
+        passwordNew = make_password(data['user']['password'])
+        data['user']['password'] = passwordNew
         original_filename, extension = os.path.splitext(photo.name)
         photo.name =data['user']['username'] + extension
         serializer = self.get_serializer(data=data)
@@ -1253,3 +1256,37 @@ class AgentRegisterView(generics.ListCreateAPIView):
             response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
                         'message': str(error)}
         return Response(response, status=status_code)
+
+class StaffUserView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = StaffSerializer
+    staff = Staff.objects.all()
+    users = User.objects.all()
+
+    def get(self, request, id=None):
+        if id:
+            staff = Staff.objects.get(user_id=id)
+            serializer = StaffSerializer(staff)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        staffall = Staff.objects.all()
+        serializer = StaffSerializer(staffall, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+class AgentUserView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = AgentSerializer
+    agent = Agent.objects.all()
+    users = User.objects.all()
+
+    def get(self, request, id=None):
+        if id:
+            agent = Agent.objects.get(user_id=id)
+            serializer = AgentSerializer(agent)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        agentall = Agent.objects.all()
+        serializer = AgentSerializer(agentall, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)

@@ -125,7 +125,7 @@ class LoginSerializer(serializers.ModelSerializer):
     device_apntoken = serializers.CharField(max_length=1000, required=False, allow_blank=True,  write_only=True)
     group_name = serializers.CharField(max_length=255, min_length=6, read_only=True)
     tokens = serializers.SerializerMethodField()
-
+    role = serializers.SerializerMethodField()
     def get_tokens(self, obj):
         user = User.objects.get(username=obj['username'])
 
@@ -134,13 +134,20 @@ class LoginSerializer(serializers.ModelSerializer):
             'access': user.tokens()['access']
         }
 
-
+    def get_role(self,obj):
+        user = User.objects.get(username=obj['username'])
+        if user.is_superuser:
+            return 'Admin'
+        elif user.is_staff:
+            return 'Student'
+        elif user.is_agent:
+            return 'Teacher'
     
 
     class Meta:
         model = User
-        read_only_fields = [ 'id','full_name', 'group_name'] 
-        fields = ['id', 'email', 'phone', 'password', 'username', 'tokens','state','district','city','area', 'full_name', 'group_name','device_name','device_uuid','device_type', 'device_fcmtoken', 'device_apntoken']
+        read_only_fields = [ 'id','full_name', 'group_name']
+        fields = ['id', 'email', 'phone', 'password', 'username','tokens','state','district','city','area', 'role', 'full_name', 'group_name','device_name','device_uuid','device_type', 'device_fcmtoken', 'device_apntoken']
 
     def validate(self, attrs):
         username = attrs.get('username', '')
@@ -163,7 +170,8 @@ class LoginSerializer(serializers.ModelSerializer):
         if not user.is_active:
             raise AuthenticationFailed('Account disabled, contact admin')
 
-        tokens = user.tokens()  
+        tokens = user.tokens()
+        # role = user.findRole()
         if settings.SINGLE_MOBILE_DEVICE_PER_USER:
             mobile_devices_count = Device.objects.filter(
                 user=user,
@@ -210,9 +218,18 @@ class LoginSerializer(serializers.ModelSerializer):
                 'type': device_type,
                 })
 
-        if not user.is_superuser == True and not ((device.type != 3 and ( user.deviceaccess == 1 or user.deviceaccess == 3)) or (device.type == 3 and ( user.deviceaccess == 2 or user.deviceaccess == 3)) ):
+        if user.is_superuser == True:
+            userValue = True
+        elif user.is_staff == True:
+            userValue =True
+        elif user.is_agent == True:
+            userValue=True
+        elif user.is_branch == True:
+            userValue=True
+
+        if not userValue == True and not ((device.type != 3 and ( user.deviceaccess == 1 or user.deviceaccess == 3)) or (device.type == 3 and ( user.deviceaccess == 2 or user.deviceaccess == 3)) ):
             raise AuthenticationFailed('This device type not allowed, contact admin')
-        
+
         device.fcmtoken = device_fcmtoken
         device.apntoken = device_apntoken
         device.accesstoken = tokens['access']
@@ -225,6 +242,7 @@ class LoginSerializer(serializers.ModelSerializer):
             'username': user.username,
             'email': user.email,
             'phone': user.phone,
+            # 'role': role,
             'group_name': group_name,
             'tokens': user.tokens,
         }

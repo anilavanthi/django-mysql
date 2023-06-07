@@ -88,6 +88,11 @@ class User(AbstractBaseUser, PermissionsMixin):
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }
+    # def findRole(self):
+    #     if self.is_superuser:
+    #         return 'Admin'
+    #     elif self.is_staff:
+    #         return 'Student'
 
 class Device(models.Model):
     ANDROID = 1

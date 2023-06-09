@@ -142,6 +142,8 @@ class LoginSerializer(serializers.ModelSerializer):
             return 'Student'
         elif user.is_agent:
             return 'Teacher'
+        elif user.is_branch:
+            return 'Branch'
     
 
     class Meta:

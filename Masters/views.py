@@ -401,7 +401,12 @@ class BranchRegisterView(generics.ListCreateAPIView):
     branches = Branch.objects.all()
     users = User.objects.all()
     def post(self, request, *args, **kwargs):
-        serializer=self.get_serializer(data=request.data)
+        # data = json.loads(request.data)
+        data = request.data
+        passwordNew = make_password(data['user']['password'])
+        data['user']['password'] = passwordNew
+        # serializer=self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         branch=serializer.save(createdby=self.request.user, modifiedby=self.request.user)
         return Response({

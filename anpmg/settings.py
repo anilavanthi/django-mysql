@@ -129,7 +129,7 @@ DATABASES = {
             "autocommit": True,
         },
         'NAME': 'anmpg_data',
-        'USER': 'root',
+        'USER': 'user',
         'PASSWORD': 'vanesh143',
         'HOST': 'localhost',
         'PORT': '3306',
